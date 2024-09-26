@@ -11,7 +11,9 @@ export class UMLClass {
       body: {
         fill: 'lightgray',
         stroke: 'black',
-        strokeWidth: 2
+        strokeWidth: 2,
+        className: className,
+        attributes: attributes
       },
       label: {
         text: this.formatLabel(className, attributes),
@@ -20,7 +22,10 @@ export class UMLClass {
         fontWeight: 'bold',
         fontFamily: 'Arial',
         textAnchor: 'middle'
-      }
+      },
+
+
+
     });
   }
 
@@ -34,8 +39,3 @@ export class UMLClass {
   }
 }
 
-// Uso de la clase UMLClass
-const graph = new dia.Graph();
-
-const umlClass = new UMLClass(100, 30, 'MyClass', ['+ attribute1: Type1', '+ attribute2: Type2']);
-graph.addCell(umlClass.getRectangle());

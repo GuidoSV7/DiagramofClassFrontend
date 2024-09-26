@@ -13,8 +13,9 @@ export class Asociacion {
           strokeWidth: 2,
           targetMarker: {
             'type': 'path',
-            'd': 'M 0 0' // Esto elimina la flecha en el extremo del enlace
-          }
+            'd': 'M 0 0' 
+          },
+           type: 'asociacion'
         }
       }
     });
