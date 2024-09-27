@@ -22,3 +22,21 @@ body {
   left: 0;
   bottom: 0;
 }
+#toolbar {
+  position: absolute;
+  top: 15px;
+  right: 40%;
+  z-index: 100;
+}
+
+#toolbar .joint-toolbar {
+  padding: 5px;
+  font-family: sans-serif;
+}
+#inspector {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 170px;
+}

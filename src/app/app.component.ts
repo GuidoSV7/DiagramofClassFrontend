@@ -1,5 +1,5 @@
 import { AfterViewInit, OnInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { dia, ui, shapes } from '@joint/plus';
+import { dia, ui, shapes, util } from '@joint/plus';
 import { Asociacion } from './Shapes/Asociacion';
 import { UMLClass } from './Shapes/UmlClass';
 
@@ -64,6 +64,36 @@ export class AppComponent implements OnInit, AfterViewInit {
   ];
   stencil.load(elements);
 
+  // create toolbar
+const toolbar = new ui.Toolbar({
+  tools: [
+      {
+          type: 'button',
+          name: 'json',
+          text: 'Export JSON'
+      },
+
+      {
+        type: 'button',
+        name: 'springboot',
+        text: 'Export SpringBoot'
+      }
+
+
+  ]
+});
+
+  toolbar.render();
+  document.getElementById('toolbar')?.appendChild(toolbar.el);
+
+  toolbar.on('json:pointerclick', () => {
+    const str = JSON.stringify(graph.toJSON());
+    const bytes = new TextEncoder().encode(str);
+    const blob = new Blob([bytes], { type: 'application/json;charset=utf-8' });
+    util.downloadBlob(blob, 'joint-plus.json');
+  });
+
+
 
     const scroller = this.scroller = new ui.PaperScroller({
         paper,
@@ -89,6 +119,20 @@ export class AppComponent implements OnInit, AfterViewInit {
 
 
     console.log(this.graph.toJSON());
+
+
+    // Event listeners for inspector
+    this.paper.on('cell:pointerdown', (cellView) => {
+      this.openInspector(cellView.model);
+    });
+
+    stencil.on('element:drop', (elementView) => {
+      this.openInspector(elementView.model);
+    });
+    // Create halo
+    this.paper.on('cell:pointerup', (cellView) => {
+      new ui.Halo({ cellView: cellView }).render();
+    });
   }
 
 
@@ -105,10 +149,72 @@ export class AppComponent implements OnInit, AfterViewInit {
     canvas.nativeElement.appendChild(this.scroller.el);
     this.scroller.center();
 
-    // Create halo
-    this.paper.on('cell:pointerup', (cellView) => {
-      new ui.Halo({ cellView: cellView }).render();
-    });
+
+
+
+
+
   }
 
+    // Inspector related methods
+    private openInspector(cell: dia.Cell): void {
+      this.closeInspector(); // close inspector if currently open
+      ui.Inspector.create('#inspector', {
+        cell: cell,
+        inputs: this.getInspectorConfig(cell),
+      });
+    }
+
+    private closeInspector(): void {
+      ui.Inspector.close();
+    }
+
+    private getInspectorConfig(cell: dia.Cell) {
+      if (cell.isElement()) {
+        return {
+          attrs: {
+            label: {
+              text: {
+                type: 'content-editable',
+                label: 'Label'
+              }
+            }
+          }
+        };
+      } else { // cell.isLink()
+        return {
+          labels: {
+            type: 'list',
+            label: 'Labels',
+            item: {
+              type: 'object',
+              properties: {
+                attrs: {
+                  text: {
+                    text: {
+                      type: 'content-editable',
+                      label: 'Text',
+                      defaultValue: 'label'
+                    }
+                  },
+                },
+                position: {
+                  type: 'select-box',
+                  options: [
+                    { value: 30, content: 'Source' },
+                    { value: 0.5, content: 'Middle' },
+                    { value: -30, content: 'Target' }
+                  ],
+                  defaultValue: 0.5,
+                  label: 'Position'
+                }
+              }
+            }
+          }
+        };
+      }
+    }
 }
+
+
+
