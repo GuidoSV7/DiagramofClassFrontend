@@ -12,8 +12,8 @@ export class UMLClass {
         fill: 'lightgray',
         stroke: 'black',
         strokeWidth: 2,
-        className: className,
-        attributes: attributes
+
+
       },
       label: {
         text: this.formatLabel(className, attributes),
@@ -23,8 +23,6 @@ export class UMLClass {
         fontFamily: 'Arial',
         textAnchor: 'middle'
       },
-
-
 
     });
   }

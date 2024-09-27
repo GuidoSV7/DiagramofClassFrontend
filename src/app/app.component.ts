@@ -2,6 +2,7 @@ import { AfterViewInit, OnInit, Component, ElementRef, ViewChild } from '@angula
 import { dia, ui, shapes, util } from '@joint/plus';
 import { Asociacion } from './Shapes/Asociacion';
 import { UMLClass } from './Shapes/UmlClass';
+import { Table } from './Shapes/UmlClassdos';
 
 @Component({
   selector: 'app-root',
@@ -103,14 +104,34 @@ const toolbar = new ui.Toolbar({
 
     scroller.render();
 
-    const rect1 = new UMLClass(100, 100,'Person', ['name: string', 'age: number']).getRectangle();
-    const rect2 = new UMLClass(400, 100,'Job', ['title: string']).getRectangle();
+    // const rect1 = new UMLClass(100, 100,'Person', ['name: string', 'age: number']).getRectangle();
+    // const rect2 = new UMLClass(400, 100,'Job', ['title: string']).getRectangle();
 
-    this.graph.addCell(rect1);
-    this.graph.addCell(rect2);
+    const orders = new Table()
+    .setName('orders')
+    .position(570, 140)
+    .setColumns([
+        { name: 'id', type: 'int'},
+        { name: 'name', type: 'varchar' },
+
+    ])
+    .addTo(graph);
+
+    const groups = new Table()
+    .setName('groups')
+    .position(900, 140)
+    .setColumns([
+        { name: 'id', type: 'int'},
+        { name: 'status', type: 'varchar' },
+
+    ])
+    .addTo(graph);
+
+    // this.graph.addCell(rect1);
+    // this.graph.addCell(rect2);
 
 
-    const customLink = new Asociacion(rect1.id, rect2.id);
+    const customLink = new Asociacion(orders.id, groups.id);
     customLink.addLabel('1..1', 0.25);
     customLink.addLabel('1..*', 0.75);
 
@@ -126,6 +147,10 @@ const toolbar = new ui.Toolbar({
       this.openInspector(cellView.model);
     });
 
+    paper.on('blank:pointerdown',  () => {
+      this.closeInspector(); // close inspector if currently open
+    });
+
     stencil.on('element:drop', (elementView) => {
       this.openInspector(elementView.model);
     });
@@ -133,6 +158,9 @@ const toolbar = new ui.Toolbar({
     this.paper.on('cell:pointerup', (cellView) => {
       new ui.Halo({ cellView: cellView }).render();
     });
+
+
+
   }
 
 
@@ -156,6 +184,7 @@ const toolbar = new ui.Toolbar({
 
   }
 
+
     // Inspector related methods
     private openInspector(cell: dia.Cell): void {
       this.closeInspector(); // close inspector if currently open
@@ -173,13 +202,23 @@ const toolbar = new ui.Toolbar({
       if (cell.isElement()) {
         return {
           attrs: {
-            label: {
+            headerLabel: {
               text: {
                 type: 'content-editable',
-                label: 'Label'
+                label: 'Nombre de la Clase'
               }
+            }},
+
+        columns:{
+          type: 'list',
+          item: {
+            type: 'object',
+            properties:{
+              name:{type:'text'},
+              type:{type:'text'}
             }
-          }
+        }
+        },groups: {}
         };
       } else { // cell.isLink()
         return {
@@ -212,8 +251,14 @@ const toolbar = new ui.Toolbar({
             }
           }
         };
+
       }
+
     }
+
+
+
+
 }
 
 
