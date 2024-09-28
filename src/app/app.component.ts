@@ -3,6 +3,8 @@ import { dia, ui, shapes, util } from '@joint/plus';
 import { Asociacion } from './Shapes/Asociacion';
 import { UMLClass } from './Shapes/UmlClass';
 import { Table } from './Shapes/UmlClassdos';
+import { Agregacion } from './Shapes/Agregacion';
+import { Composicion } from './Shapes/Composicion';
 
 @Component({
   selector: 'app-root',
@@ -331,6 +333,7 @@ this.paper.on('cell:pointerup', (cellView) => {
         linkView.model.target({ id: targetElement.model.id });
         associationLink.setTarget(targetElement.model.id);
 
+
         console.log('Enlace conectado al nuevo nodo:', targetElement.model.id);
       } else {
         console.log('Ya existe un enlace entre estos nodos.');
@@ -341,7 +344,143 @@ this.paper.on('cell:pointerup', (cellView) => {
   });
 }
         }
+      },
+
+      {
+        name: 'remove',
+
+        events: {
+          pointerdown: 'removeElement'
+        }
+      },
+
+      {
+        name:'agregacion',
+        icon: 'assets/agregation.ico', // Usar una URL de imagen directamente
+        events: {
+          'pointerdown': (evt, x, y) => {
+            const sourceCell = cellView.model;
+
+          // Crear una nueva instancia de tu clase de asociación
+          const agreagacionLink = new Agregacion(sourceCell.id, null); // El target se establecerá después
+
+          // Agregar el enlace a la gráfica
+          this.graph.addCell(agreagacionLink.getLink());
+
+          // Escuchar el evento de conexión para definir el target
+          this.paper.once('link:connect', (linkView, evt, connectedElementView) => {
+            const targetCell = connectedElementView.model;
+
+            // Si el target es válido, establece el target del enlace
+            if (targetCell) {
+              agreagacionLink.setTarget(targetCell.id);
+
+      // Configurar el enlace para evitar sobreposiciones
+      agreagacionLink.getLink().set('vertices', [
+        { x: sourceCell.getBBox().center().x, y: sourceCell.getBBox().center().y - 20 }, // Punto intermedio para evitar superposición
+        { x: targetCell.getBBox().center().x, y: targetCell.getBBox().center().y - 20 }
+      ]);
+    }
+  });
+
+
+  // Permitir soltar el enlace para cambiar el target
+  this.paper.on('link:pointerup', (linkView, evt, x, y) => {
+    console.log('Soltando el enlace en:', x, y);
+    const targetElement = this.paper.findViewsFromPoint({ x, y })[0];
+    if (targetElement) {
+      // Verificar si ya existe un enlace entre los mismos nodos
+      const existingLinks = this.graph.getLinks().filter(link => {
+        return link.get('source').id === linkView.model.get('source').id &&
+               link.get('target').id === targetElement.model.id;
+      });
+
+      if (existingLinks.length === 0) {
+        linkView.model.target({ id: targetElement.model.id });
+        agreagacionLink.setTarget(targetElement.model.id);
+
+
+        console.log('Enlace conectado al nuevo nodo:', targetElement.model.id);
+      } else {
+        console.log('Ya existe un enlace entre estos nodos.');
       }
+    } else {
+      console.log('No se encontró un nodo en la posición:', x, y);
+    }
+  });
+}
+        }
+
+      },
+      {
+        name:'composicion',
+        icon: 'assets/composition.ico', // Usar una URL de imagen directamente
+        events: {
+          'pointerdown': (evt, x, y) => {
+            const sourceCell = cellView.model;
+
+          // Crear una nueva instancia de tu clase de asociación
+          const composicionLink = new Composicion(sourceCell.id, null); // El target se establecerá después
+
+          // Agregar el enlace a la gráfica
+          this.graph.addCell(composicionLink.getLink());
+
+          // Escuchar el evento de conexión para definir el target
+          this.paper.once('link:connect', (linkView, evt, connectedElementView) => {
+            const targetCell = connectedElementView.model;
+
+            // Si el target es válido, establece el target del enlace
+            if (targetCell) {
+              composicionLink.setTarget(targetCell.id);
+
+      // Configurar el enlace para evitar sobreposiciones
+      composicionLink.getLink().set('vertices', [
+        { x: sourceCell.getBBox().center().x, y: sourceCell.getBBox().center().y - 20 }, // Punto intermedio para evitar superposición
+        { x: targetCell.getBBox().center().x, y: targetCell.getBBox().center().y - 20 }
+      ]);
+    }
+  });
+
+
+  // Permitir soltar el enlace para cambiar el target
+  this.paper.on('link:pointerup', (linkView, evt, x, y) => {
+    console.log('Soltando el enlace en:', x, y);
+    const targetElement = this.paper.findViewsFromPoint({ x, y })[0];
+    if (targetElement) {
+      // Verificar si ya existe un enlace entre los mismos nodos
+      const existingLinks = this.graph.getLinks().filter(link => {
+        return link.get('source').id === linkView.model.get('source').id &&
+               link.get('target').id === targetElement.model.id;
+      });
+
+      if (existingLinks.length === 0) {
+        linkView.model.target({ id: targetElement.model.id });
+        composicionLink.setTarget(targetElement.model.id);
+
+
+        console.log('Enlace conectado al nuevo nodo:', targetElement.model.id);
+      } else {
+        console.log('Ya existe un enlace entre estos nodos.');
+      }
+    } else {
+      console.log('No se encontró un nodo en la posición:', x, y);
+    }
+  });
+}
+        }
+
+      },
+
+
+    {
+      name: 'clone',
+
+      events: {
+        pointerdown: 'cloneElement'
+      },
+
+
+    }
     ]
   }).render();
 });

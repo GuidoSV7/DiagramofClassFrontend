@@ -1,7 +1,7 @@
 import { dia, shapes } from '@joint/plus';
 
-export class Agregacion {
-  private link: joint.shapes.standard.Link;
+export class Composicion {
+  private link: dia.Link;
 
   constructor(sourceId: any, targetId: any) {
     this.link = new shapes.standard.Link({
@@ -13,23 +13,23 @@ export class Agregacion {
           strokeWidth: 2,
           targetMarker: {
             'type': 'path',
-            'd': 'M 10 -5 L 0 0 L 10 5 Z', // Forma de diamante para agregación
-            'fill': 'white', // Relleno blanco para diferenciar de la composición
-            'stroke': 'black'
-          },
-          type: 'agregacion'
+            'd': 'M 10 -5 0 0 10 5 Z',
+            'fill': 'black'
+          }
         }
       }
     });
   }
+
+  getLink() {
+    return this.link;
+  }
+
   setSource(sourceId: any) {
     this.link.set('source', { id: sourceId });
   }
 
   setTarget(targetId: any) {
     this.link.set('target', { id: targetId });
-  }
-  getLink() {
-    return this.link;
   }
 }
