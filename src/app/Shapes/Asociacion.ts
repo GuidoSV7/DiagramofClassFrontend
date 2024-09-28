@@ -1,4 +1,4 @@
-import { dia, ui, shapes } from '@joint/plus';
+import { dia, shapes } from '@joint/plus';
 
 export class Asociacion {
   private link: joint.shapes.standard.Link;
@@ -15,7 +15,7 @@ export class Asociacion {
             'type': 'path',
             'd': 'M 0 0' 
           },
-           type: 'asociacion'
+          type: 'asociacion'
         }
       }
     });
@@ -36,6 +36,14 @@ export class Asociacion {
         distance: distance // Posición relativa en el enlace (0.0 - 1.0)
       }
     });
+  }
+
+  setSource(sourceId: any) {
+    this.link.set('source', { id: sourceId });
+  }
+
+  setTarget(targetId: any) {
+    this.link.set('target', { id: targetId });
   }
 
   getLink() {
