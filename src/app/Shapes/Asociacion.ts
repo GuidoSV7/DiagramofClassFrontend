@@ -13,9 +13,55 @@ export class Asociacion {
           strokeWidth: 2,
           targetMarker: {
             'type': 'path',
-            'd': 'M 0 0' 
+            'd': 'M 0 0'
           },
           type: 'asociacion'
+        }
+      }
+    });
+    this.addDefaultLabels();
+  }
+
+  addDefaultLabels() {
+    this.link.label(0, {
+      position: 0.25,
+      attrs: {
+        text: {
+          text: '1..1',
+          fill: 'black', // Color del texto
+          fontSize: 12, // Tamaño de la fuente
+          fontFamily: 'Arial', // Familia de la fuente
+          fontWeight: 'bold', // Peso de la fuente
+          textAnchor: 'middle', // Alineación del texto
+          yAlignment: 'middle' // Alineación vertical del texto
+        },
+        rect: {
+          fill: '#FFFFFF', // Color de fondo del rectángulo
+          stroke: '#000000', // Color del borde del rectángulo
+          strokeWidth: 1, // Ancho del borde del rectángulo
+          rx: 5, // Radio de las esquinas del rectángulo
+          ry: 5 // Radio de las esquinas del rectángulo
+        }
+      }
+    });
+    this.link.label(1, {
+      position: 0.75,
+      attrs: {
+        text: {
+          text: '1..*',
+          fill: 'black', // Color del texto
+          fontSize: 12, // Tamaño de la fuente
+          fontFamily: 'Arial', // Familia de la fuente
+          fontWeight: 'bold', // Peso de la fuente
+          textAnchor: 'middle', // Alineación del texto
+          yAlignment: 'middle' // Alineación vertical del texto
+        },
+        rect: {
+          fill: '#FFFFFF', // Color de fondo del rectángulo
+          stroke: '#000000', // Color del borde del rectángulo
+          strokeWidth: 1, // Ancho del borde del rectángulo
+          rx: 5, // Radio de las esquinas del rectángulo
+          ry: 5 // Radio de las esquinas del rectángulo
         }
       }
     });
@@ -26,10 +72,19 @@ export class Asociacion {
       attrs: {
         text: {
           text: text,
-          fill: 'black',
-          fontSize: 14,
-          fontWeight: 'bold',
-          fontFamily: 'Arial'
+          fill: 'black', // Color del texto
+          fontSize: 14, // Tamaño de la fuente
+          fontWeight: 'bold', // Peso de la fuente
+          fontFamily: 'Arial', // Familia de la fuente
+          textAnchor: 'middle', // Alineación del texto
+          yAlignment: 'middle' // Alineación vertical del texto
+        },
+        rect: {
+          fill: '#FFFFFF', // Color de fondo del rectángulo
+          stroke: '#000000', // Color del borde del rectángulo
+          strokeWidth: 1, // Ancho del borde del rectángulo
+          rx: 5, // Radio de las esquinas del rectángulo
+          ry: 5 // Radio de las esquinas del rectángulo
         }
       },
       position: {

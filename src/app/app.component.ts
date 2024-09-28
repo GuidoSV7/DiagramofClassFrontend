@@ -288,24 +288,24 @@ this.paper.on('cell:pointerup', (cellView) => {
       {
         name: 'link',
 
-      // Agrega un ícono personalizado si lo deseas
+
         events: {
           'pointerdown': (evt, x, y) => {
             const sourceCell = cellView.model;
 
-  // Crear una nueva instancia de tu clase de asociación
-  const associationLink = new Asociacion(sourceCell.id, null); // El target se establecerá después
+          // Crear una nueva instancia de tu clase de asociación
+          const associationLink = new Asociacion(sourceCell.id, null); // El target se establecerá después
 
-  // Agregar el enlace a la gráfica
-  this.graph.addCell(associationLink.getLink());
+          // Agregar el enlace a la gráfica
+          this.graph.addCell(associationLink.getLink());
 
-  // Escuchar el evento de conexión para definir el target
-  this.paper.once('link:connect', (linkView, evt, connectedElementView) => {
-    const targetCell = connectedElementView.model;
+          // Escuchar el evento de conexión para definir el target
+          this.paper.once('link:connect', (linkView, evt, connectedElementView) => {
+            const targetCell = connectedElementView.model;
 
-    // Si el target es válido, establece el target del enlace
-    if (targetCell) {
-      associationLink.setTarget(targetCell.id);
+            // Si el target es válido, establece el target del enlace
+            if (targetCell) {
+              associationLink.setTarget(targetCell.id);
 
       // Configurar el enlace para evitar sobreposiciones
       associationLink.getLink().set('vertices', [
@@ -315,25 +315,26 @@ this.paper.on('cell:pointerup', (cellView) => {
     }
   });
 
-  // Permitir arrastrar el enlace para cambiar el target
-  this.paper.on('link:move', (linkView, evt, x, y) => {
-    console.log('Moviendo el enlace a:', x, y);
-  });
 
   // Permitir soltar el enlace para cambiar el target
   this.paper.on('link:pointerup', (linkView, evt, x, y) => {
     console.log('Soltando el enlace en:', x, y);
     const targetElement = this.paper.findViewsFromPoint({ x, y })[0];
     if (targetElement) {
-      linkView.model.target({ id: targetElement.model.id });
-      associationLink.setTarget(targetElement.model.id);
-      console.log('Enlace conectado al nuevo nodo:', targetElement.model.id);
+      // Verificar si ya existe un enlace entre los mismos nodos
+      const existingLinks = this.graph.getLinks().filter(link => {
+        return link.get('source').id === linkView.model.get('source').id &&
+               link.get('target').id === targetElement.model.id;
+      });
 
-      // Configurar el enlace para evitar sobreposiciones
-      associationLink.getLink().set('vertices', [
-        { x: sourceCell.getBBox().center().x, y: sourceCell.getBBox().center().y - 20 }, // Punto intermedio para evitar superposición
-        { x: targetElement.model.getBBox().center().x, y: targetElement.model.getBBox().center().y - 20 }
-      ]);
+      if (existingLinks.length === 0) {
+        linkView.model.target({ id: targetElement.model.id });
+        associationLink.setTarget(targetElement.model.id);
+
+        console.log('Enlace conectado al nuevo nodo:', targetElement.model.id);
+      } else {
+        console.log('Ya existe un enlace entre estos nodos.');
+      }
     } else {
       console.log('No se encontró un nodo en la posición:', x, y);
     }
