@@ -13,7 +13,8 @@ export class Asociacion {
           strokeWidth: 2,
           targetMarker: {
             'type': 'path',
-            'd': 'M 10 -5 0 0 10 5 Z' // Definición original
+            'd': 'M 0 0 L 0 0',
+            'stroke': 'black'
           },
           type: 'none'
         }

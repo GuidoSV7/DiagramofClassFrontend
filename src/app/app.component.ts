@@ -108,6 +108,11 @@ const toolbar = new ui.Toolbar({
     this.exportGraphToServer();
   });
 
+  toolbar.on('springboot:pointerclick', () => {
+    this.exportSpringBoot();
+  });
+
+
 
 
 
@@ -120,8 +125,6 @@ const toolbar = new ui.Toolbar({
 
     scroller.render();
 
-    // const rect1 = new UMLClass(100, 100,'Person', ['name: string', 'age: number']).getRectangle();
-    // const rect2 = new UMLClass(400, 100,'Job', ['title: string']).getRectangle();
 
     const orders = new Table()
     .setName('orders')
@@ -145,11 +148,7 @@ const toolbar = new ui.Toolbar({
 
 
 
-    // this.graph.addCell(rect1);
-    // this.graph.addCell(rect2);
-
-
-    const customLink = new Agregacion(orders.id, groups.id);
+    const customLink = new Asociacion(orders.id, groups.id);
 
 
 
@@ -479,7 +478,23 @@ this.paper.on('cell:pointerup', (cellView) => {
       }
     }
 
-    private downloadFile(data: string, filename: string, type: string) {
+    private async exportSpringBoot() {
+      const graphJson = this.graph.toJSON();
+      try {
+        const response = await this.http.post('http://localhost:3000/api/springboot-generator/download', graphJson, { responseType: 'arraybuffer' }).toPromise();
+        if (response) {
+          const responseText = new TextDecoder().decode(response);
+          console.log('Graph exported successfully:', responseText);
+          this.downloadFile(response, 'backend.rar', 'application/x-rar-compressed');
+        } else {
+          console.error('Error: Response is undefined');
+        }
+      } catch (error) {
+        console.error('Error exporting graph:', error);
+      }
+    }
+
+    private downloadFile(data: any, filename: string, type: string) {
       const blob = new Blob([data], { type: type });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
