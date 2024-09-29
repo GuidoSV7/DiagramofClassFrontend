@@ -1,7 +1,7 @@
 import { dia, shapes } from '@joint/plus';
 
 export class Composicion {
-  private link: dia.Link;
+  private link: joint.shapes.standard.Link;
 
   constructor(sourceId: any, targetId: any) {
     this.link = new shapes.standard.Link({
@@ -15,7 +15,8 @@ export class Composicion {
             'type': 'path',
             'd': 'M 10 -5 0 0 10 5 Z',
             'fill': 'black'
-          }
+          },
+          type: 'composite'
         }
       }
     });

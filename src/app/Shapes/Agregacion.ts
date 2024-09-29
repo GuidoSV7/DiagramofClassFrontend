@@ -17,7 +17,7 @@ export class Agregacion {
             'fill': 'white', // Relleno blanco para diferenciar de la composición
             'stroke': 'black'
           },
-          type: 'agregacion'
+          type: 'shared'
         }
       }
     });

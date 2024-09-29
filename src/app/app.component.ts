@@ -5,6 +5,7 @@ import { UMLClass } from './Shapes/UmlClass';
 import { Table } from './Shapes/UmlClassdos';
 import { Agregacion } from './Shapes/Agregacion';
 import { Composicion } from './Shapes/Composicion';
+import { HttpClient } from '@angular/common/http'; // Importa HttpClient
 
 @Component({
   selector: 'app-root',
@@ -17,6 +18,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   private graph: dia.Graph;
   private paper: dia.Paper;
   private scroller: ui.PaperScroller;
+
+  constructor(private http: HttpClient) {} // Inyecta HttpClient
 
 
 
@@ -48,8 +51,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     layout: true,
     dropAnimation: true,
     groups: {
-      one: { label: 'Tables', index: 1 },
-      two: { label: 'Lines', index: 2, closed: true }
+      one: { label: 'Tables', index: 1 }
     }
 
   });
@@ -85,7 +87,7 @@ const toolbar = new ui.Toolbar({
       {
           type: 'button',
           name: 'json',
-          text: 'Export JSON'
+          text: 'Export Architect'
       },
 
       {
@@ -103,11 +105,10 @@ const toolbar = new ui.Toolbar({
   document.getElementById('toolbar')?.appendChild(toolbar.el);
 
   toolbar.on('json:pointerclick', () => {
-    const str = JSON.stringify(graph.toJSON());
-    const bytes = new TextEncoder().encode(str);
-    const blob = new Blob([bytes], { type: 'application/json;charset=utf-8' });
-    util.downloadBlob(blob, 'joint-plus.json');
+    this.exportGraphToServer();
   });
+
+
 
 
 
@@ -148,9 +149,8 @@ const toolbar = new ui.Toolbar({
     // this.graph.addCell(rect2);
 
 
-    const customLink = new Asociacion(orders.id, groups.id);
-    customLink.addLabel('1..1', 0.25);
-    customLink.addLabel('1..*', 0.75);
+    const customLink = new Agregacion(orders.id, groups.id);
+
 
 
     graph.addCell(customLink.getLink());
@@ -158,64 +158,6 @@ const toolbar = new ui.Toolbar({
 
     console.log(this.graph.toJSON());
 
-
-    //   // Crear un elemento de ejemplo
-    //   const rect = new shapes.standard.Rectangle();
-    //   rect.position(100, 100);
-    //   rect.resize(100, 40);
-    //   rect.attr({
-    //     body: {
-    //       fill: 'blue'
-    //     },
-    //     label: {
-    //       text: 'Hello',
-    //       fill: 'white'
-    //     }
-    //   });
-    //   this.graph.addCell(rect);
-
-    //         // Crear un elemento de ejemplo
-    //         const rect2 = new shapes.standard.Rectangle();
-
-    //         rect2.position(80, 200);
-    //         rect2.resize(100, 40);
-    //         rect2.attr({
-    //           body: {
-    //             fill: 'red',
-    //             magnet: true // Habilitar el magnetismo para permitir conexiones
-    //           },
-    //           label: {
-    //             text: 'Hello',
-    //             fill: 'white',
-
-    //           },
-
-
-    //         }
-
-    //       );
-    //         this.graph.addCell(rect2);
-
-    //   // Crear un enlace de ejemplo
-    // const link = new shapes.standard.Link({
-    //   attrs: {
-    //     line: {
-    //       stroke: '#000',
-    //       strokeWidth: 2,
-    //       targetMarker: {
-    //         type: 'path',
-    //         d: 'M 10 -5 0 0 10 5 Z',
-    //         fill: '#000'
-    //       }
-    //     }
-    //   },
-    //   // Hacer que el enlace sea conectable a otros elementos
-
-    //   router: { name: 'manhattan' }, // Evita la superposición de elementos
-    //   z: -1 // Asegurarse de que el enlace esté en el fondo
-    // });
-    //   link.source({ id: rect.id });
-    //   this.graph.addCell(link);
 
 
     // Escuchar el evento de conexión para definir el target
@@ -296,7 +238,7 @@ this.paper.on('cell:pointerup', (cellView) => {
             const sourceCell = cellView.model;
 
           // Crear una nueva instancia de tu clase de asociación
-          const associationLink = new Asociacion(sourceCell.id, null); // El target se establecerá después
+          const associationLink = new Asociacion(sourceCell.id, null);
 
           // Agregar el enlace a la gráfica
           this.graph.addCell(associationLink.getLink());
@@ -519,6 +461,34 @@ this.paper.on('cell:pointerup', (cellView) => {
         cell: cell,
         inputs: this.getInspectorConfig(cell),
       });
+    }
+
+    private async exportGraphToServer() {
+      const graphJson = this.graph.toJSON();
+      try {
+        const response = await this.http.post('http://localhost:3000/api/architect/json-to-xml', graphJson, { responseType: 'arraybuffer' }).toPromise();
+        if (response) {
+          const responseText = new TextDecoder().decode(response);
+          console.log('Graph exported successfully:', responseText);
+          this.downloadFile(responseText, 'graph.xml', 'application/xml');
+        } else {
+          console.error('Error: Response is undefined');
+        }
+      } catch (error) {
+        console.error('Error exporting graph:', error);
+      }
+    }
+
+    private downloadFile(data: string, filename: string, type: string) {
+      const blob = new Blob([data], { type: type });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
     }
 
     private closeInspector(): void {

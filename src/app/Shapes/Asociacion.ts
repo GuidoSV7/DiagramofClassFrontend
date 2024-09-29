@@ -13,9 +13,9 @@ export class Asociacion {
           strokeWidth: 2,
           targetMarker: {
             'type': 'path',
-            'd': 'M 0 0'
+            'd': 'M 10 -5 0 0 10 5 Z' // Definición original
           },
-          type: 'asociacion'
+          type: 'none'
         }
       }
     });
