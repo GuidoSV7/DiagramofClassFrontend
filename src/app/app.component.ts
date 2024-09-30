@@ -24,7 +24,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
 
   public ngOnInit(): void {
-    const graph = this.graph = new dia.Graph({}, { cellNamespace: shapes });
+    const graph = this.graph =new dia.Graph({}, { cellNamespace: { ...shapes, app: { Table } } });
 
     const paper = this.paper = new dia.Paper({
         el: document.getElementById('paper'),
@@ -92,9 +92,21 @@ const toolbar = new ui.Toolbar({
 
       {
         type: 'button',
+        name: 'jsonimport',
+        text: 'Import Architect'
+    },
+
+      {
+        type: 'button',
         name: 'springboot',
         text: 'Export SpringBoot'
       },
+      {
+        type: 'button',
+        name: 'json',
+        text: 'Export JSON'
+    },
+
 
 
 
@@ -111,6 +123,18 @@ const toolbar = new ui.Toolbar({
   toolbar.on('springboot:pointerclick', () => {
     this.exportSpringBoot();
   });
+
+  toolbar.on('jsonimport:pointerclick',()=>{
+    this.importGraphFromServer();
+  });
+
+    toolbar.on('json:pointerclick', () => {
+      const str = JSON.stringify(graph.toJSON());
+      const bytes = new TextEncoder().encode(str);
+      const blob = new Blob([bytes], { type: 'application/json;charset=utf-8' });
+      util.downloadBlob(blob, 'joint-plus.json');
+  });
+
 
 
 
@@ -493,6 +517,26 @@ this.paper.on('cell:pointerup', (cellView) => {
         console.error('Error exporting graph:', error);
       }
     }
+
+   private importGraphFromServer() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = (event: any) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        const content = e.target.result;
+        console.log(content);
+        const graphJson = JSON.parse(content); // Cambiado a JSON.parse
+        this.graph.fromJSON(graphJson);
+      };
+      reader.readAsText(file);
+    }
+  };
+  input.click();
+}
 
     private downloadFile(data: any, filename: string, type: string) {
       const blob = new Blob([data], { type: type });
