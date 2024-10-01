@@ -86,7 +86,7 @@ const toolbar = new ui.Toolbar({
   tools: [
       {
           type: 'button',
-          name: 'json',
+          name: 'jsonarchitect',
           text: 'Export Architect'
       },
 
@@ -116,7 +116,7 @@ const toolbar = new ui.Toolbar({
   toolbar.render();
   document.getElementById('toolbar')?.appendChild(toolbar.el);
 
-  toolbar.on('json:pointerclick', () => {
+  toolbar.on('jsonarchitect:pointerclick', () => {
     this.exportGraphToServer();
   });
 
@@ -315,7 +315,7 @@ this.paper.on('cell:pointerup', (cellView) => {
         name: 'remove',
 
         events: {
-          pointerdown: 'removeElement'
+          pointerdown: 'c'
         }
       },
 
@@ -518,25 +518,33 @@ this.paper.on('cell:pointerup', (cellView) => {
       }
     }
 
-   private importGraphFromServer() {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.json';
-  input.onchange = (event: any) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        const content = e.target.result;
-        console.log(content);
-        const graphJson = JSON.parse(content); // Cambiado a JSON.parse
-        this.graph.fromJSON(graphJson);
+    private importGraphFromServer() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.xml';
+      input.onchange = (event: any) => {
+        const file = event.target.files[0];
+        if (file) {
+          const formData = new FormData();
+          formData.append('file', file);
+
+          this.http.post('http://localhost:3000/api/architect/json-to-graph', formData, {
+            headers: { 'Accept': 'application/json' },
+            responseType: 'json'
+          }).subscribe(
+            (response: any) => {
+              const graphJson = response;
+              console.log(graphJson);
+              this.graph.fromJSON(graphJson);
+            },
+            (error) => {
+              console.error('Error importing graph:', error);
+            }
+          );
+        }
       };
-      reader.readAsText(file);
+      input.click();
     }
-  };
-  input.click();
-}
 
     private downloadFile(data: any, filename: string, type: string) {
       const blob = new Blob([data], { type: type });

@@ -83,7 +83,11 @@ export class Table extends shapes.standard.HeaderedRecord {
                   // SVGGroup does not accept `x` attribute
                   refX: '50%',
                   refX2: -26
-              }
+              },
+              // Asegúrate de que los atributos de la tabla no sean magnéticos
+                '.attribute': {
+                  magnet: false
+                }
           }
       }, super.defaults);
   }
