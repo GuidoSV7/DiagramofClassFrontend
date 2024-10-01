@@ -6,6 +6,7 @@ import { Table } from './Shapes/UmlClassdos';
 import { Agregacion } from './Shapes/Agregacion';
 import { Composicion } from './Shapes/Composicion';
 import { HttpClient } from '@angular/common/http'; // Importa HttpClient
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -18,6 +19,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   private graph: dia.Graph;
   private paper: dia.Paper;
   private scroller: ui.PaperScroller;
+  private apiUrl: string = environment.apiUrl;
 
   constructor(private http: HttpClient) {} // Inyecta HttpClient
 
@@ -315,7 +317,7 @@ this.paper.on('cell:pointerup', (cellView) => {
         name: 'remove',
 
         events: {
-          pointerdown: 'c'
+          pointerdown: 'removeElement'
         }
       },
 
@@ -489,7 +491,7 @@ this.paper.on('cell:pointerup', (cellView) => {
     private async exportGraphToServer() {
       const graphJson = this.graph.toJSON();
       try {
-        const response = await this.http.post('http://localhost:3000/api/architect/json-to-xml', graphJson, { responseType: 'arraybuffer' }).toPromise();
+        const response = await this.http.post(`${this.apiUrl}/api/architect/json-to-xml`, graphJson, { responseType: 'arraybuffer' }).toPromise();
         if (response) {
           const responseText = new TextDecoder().decode(response);
           console.log('Graph exported successfully:', responseText);
@@ -505,7 +507,7 @@ this.paper.on('cell:pointerup', (cellView) => {
     private async exportSpringBoot() {
       const graphJson = this.graph.toJSON();
       try {
-        const response = await this.http.post('http://localhost:3000/api/springboot-generator/download', graphJson, { responseType: 'arraybuffer' }).toPromise();
+        const response = await this.http.post(`${this.apiUrl}/api/springboot-generator/download`, graphJson, { responseType: 'arraybuffer' }).toPromise();
         if (response) {
           const responseText = new TextDecoder().decode(response);
           console.log('Graph exported successfully:', responseText);
@@ -528,7 +530,7 @@ this.paper.on('cell:pointerup', (cellView) => {
           const formData = new FormData();
           formData.append('file', file);
 
-          this.http.post('http://localhost:3000/api/architect/json-to-graph', formData, {
+          this.http.post(`${this.apiUrl}/api/architect/json-to-graph`, formData, {
             headers: { 'Accept': 'application/json' },
             responseType: 'json'
           }).subscribe(
