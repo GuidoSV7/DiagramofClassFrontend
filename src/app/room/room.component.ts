@@ -7,6 +7,8 @@ import { Composicion } from '../Shapes/Composicion';
 import { HttpClient } from '@angular/common/http'; // Importa HttpClient
 import { environment } from 'src/environments/environment';
 import { SocketService } from '../Services/socketService.service';
+import { ActivatedRoute } from '@angular/router';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-room',
@@ -14,6 +16,8 @@ import { SocketService } from '../Services/socketService.service';
   styleUrls: ['./room.component.scss']
 })
 export class RoomComponent implements OnInit, AfterViewInit {
+
+  room:string
 
   @ViewChild('canvas') canvas: ElementRef;
 
@@ -25,14 +29,22 @@ export class RoomComponent implements OnInit, AfterViewInit {
   constructor(
     private http: HttpClient,
     private socketService: SocketService,
+    private router:ActivatedRoute,
+    private cookieService:CookieService
+    
 
+  ) {
 
-  ) {} // Inyecta HttpClient
+    socketService.callback.subscribe((res: any) => {
+      
+      this.graph.fromJSON(res.graph)
+      
+    })
+  } // Inyecta HttpClient
 
 
 
   public ngOnInit(): void {
-
 
 
     const graph = this.graph =new dia.Graph({}, { cellNamespace: { ...shapes, app: { Table } } });
@@ -166,7 +178,7 @@ const toolbar = new ui.Toolbar({
 
     const orders = new Table()
     .setName('orders')
-    .position(570, 140)
+    .position(100, 140)
     .setColumns([
         { name: 'id', type: 'int'},
         { name: 'name', type: 'varchar' },
@@ -176,7 +188,7 @@ const toolbar = new ui.Toolbar({
 
     const groups = new Table()
     .setName('groups')
-    .position(900, 140)
+    .position(500, 140)
     .setColumns([
         { name: 'id', type: 'int'},
         { name: 'status', type: 'varchar' },
@@ -201,7 +213,7 @@ const toolbar = new ui.Toolbar({
     this.paper.on('link:connect', (linkView, evt, connectedElementView) => {
       if (connectedElementView) {
         const targetCell = connectedElementView.model;
-        console.log('Elemento conectado:', targetCell);
+        
         // Aquí puedes trabajar con el modelo del elemento conectado
       }
     });
@@ -238,6 +250,33 @@ const toolbar = new ui.Toolbar({
     });
 
 
+     // Movimiento del cell
+     this.paper.on('cell:pointermove', (cellView) => {
+      this.emitGraphState('cell:pointermove', cellView);
+    });
+    
+    // Inicio del movimiento del cell
+    this.paper.on('cell:pointerdown', (cellView) => {
+      this.emitGraphState('cell:pointerdown', cellView);
+    });
+    
+    // Fin del movimiento del cell
+    this.paper.on('cell:pointerup', (cellView) => {
+      this.emitGraphState('cell:pointerup', cellView);
+    });
+    
+    // Otros eventos que quieras manejar
+    this.paper.on('cell:mouseover', (cellView) => {
+      this.emitGraphState('cell:mouseover', cellView);
+    });
+    
+    this.paper.on('cell:mouseout', (cellView) => {
+      this.emitGraphState('cell:mouseout', cellView);
+    });
+
+    
+
+    
 
     // Event listeners for inspector
     this.paper.on('cell:pointerdown', (cellView) => {
@@ -329,7 +368,11 @@ this.paper.on('cell:pointerup', (cellView) => {
         name: 'remove',
 
         events: {
-          pointerdown: 'removeElement'
+          pointerdown: 'removeElement',
+
+
+        
+      
         }
       },
 
@@ -558,6 +601,16 @@ this.paper.on('cell:pointerup', (cellView) => {
         }
       };
       input.click();
+    }
+
+    private emitGraphState(eventName: string, cellView: dia.CellView) {
+      const graphState = this.graph.toJSON();
+      this.socketService.emitEvent({
+        event: eventName,
+        cellId: cellView.model.id,
+        graph: graphState,
+        room: this.cookieService.get('room')
+      });
     }
 
     private downloadFile(data: any, filename: string, type: string) {

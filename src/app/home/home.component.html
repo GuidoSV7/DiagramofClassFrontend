@@ -1,1 +1,25 @@
-<p>home works!</p>
+<div class="container">
+  <h1>Bienvenido a la aplicación de salas</h1>
+
+  <!-- Sección para crear una sala -->
+  <div class="create-room">
+    <h2>Crear una sala</h2>
+    <form (ngSubmit)="createRoom(roomName.value)">
+      <label for="roomName">Nombre de la sala:</label>
+      <input type="text" id="roomName" #roomName required>
+      <button type="submit">Crear sala</button>
+    </form>
+  </div>
+
+  <!-- Sección para unirse a una sala -->
+  <div class="join-room">
+    <h2>Unirse a una sala</h2>
+    <form (ngSubmit)="joinRoom(joinRoomName.value)">
+      <label for="joinRoomName">Nombre de la sala:</label>
+      <input type="text" id="joinRoomName" #joinRoomName required>
+      <button type="submit">Unirse a la sala</button>
+    </form>
+  </div>
+</div>
+
+<script src="socket.io/socket.io.js"></script>
