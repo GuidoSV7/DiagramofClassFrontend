@@ -1,19 +1,20 @@
 import { AfterViewInit, OnInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { dia, ui, shapes, util } from '@joint/plus';
-import { Asociacion } from './Shapes/Asociacion';
-import { Table } from './Shapes/UmlClassdos';
-import { Agregacion } from './Shapes/Agregacion';
-import { Composicion } from './Shapes/Composicion';
+import { Asociacion } from '../Shapes/Asociacion';
+import { Table } from '../Shapes/UmlClassdos';
+import { Agregacion } from '../Shapes/Agregacion';
+import { Composicion } from '../Shapes/Composicion';
 import { HttpClient } from '@angular/common/http'; // Importa HttpClient
 import { environment } from 'src/environments/environment';
-import { SocketService } from './Services/socketService.service';
+import { SocketService } from '../Services/socketService.service';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  selector: 'app-room',
+  templateUrl: './room.component.html',
+  styleUrls: ['./room.component.scss']
 })
-export class AppComponent implements OnInit, AfterViewInit {
+export class RoomComponent implements OnInit, AfterViewInit {
+
   @ViewChild('canvas') canvas: ElementRef;
 
   private graph: dia.Graph;
@@ -23,7 +24,8 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   constructor(
     private http: HttpClient,
-    private socketService: SocketService
+    private socketService: SocketService,
+
 
   ) {} // Inyecta HttpClient
 
