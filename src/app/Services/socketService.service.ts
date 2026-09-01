@@ -9,12 +9,12 @@ import { environment } from 'src/environments/environment';  // Asegúrate de co
 })
 export class SocketService extends Socket{
   private socket: Socket;
-   
+
   @Output() outEven: EventEmitter<any> = new EventEmitter();
   @Output() callback: EventEmitter<any> = new EventEmitter();
   constructor(
     private  cookieService: CookieService
-  ) { 
+  ) {
     super({
       url: environment.apiUrl,
       options: {
@@ -28,12 +28,13 @@ export class SocketService extends Socket{
   }
 
   listen = () => {
-    this.ioSocket.on('event', (res: any) => this.callback.emit(res));   
+    this.ioSocket.on('event', (res: any) => this.callback.emit(res));
 
   }
 
   emitEvent = (payload = {}) => {
     this.ioSocket.emit('event', payload)
+
   }
 
 

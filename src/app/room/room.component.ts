@@ -10,6 +10,7 @@ import { SocketService } from '../Services/socketService.service';
 import { ActivatedRoute } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 
+
 @Component({
   selector: 'app-room',
   templateUrl: './room.component.html',
@@ -31,14 +32,14 @@ export class RoomComponent implements OnInit, AfterViewInit {
     private socketService: SocketService,
     private router:ActivatedRoute,
     private cookieService:CookieService
-    
+
 
   ) {
 
     socketService.callback.subscribe((res: any) => {
-      
+      console.log(res);
       this.graph.fromJSON(res.graph)
-      
+
     })
   } // Inyecta HttpClient
 
@@ -56,7 +57,7 @@ export class RoomComponent implements OnInit, AfterViewInit {
             color: '#F8F9FA',
         },
         width: 600,
-        height: 600,
+        height: 1200,
         async: true,
         drawGrid: true,
         interactive: { linkMove: true }, // Permitir mover y conectar enlaces
@@ -64,9 +65,11 @@ export class RoomComponent implements OnInit, AfterViewInit {
         snapLinks: true,
         linkPinning: false,
 
+
+
     });
 
-
+    paper.scale(0.8, 0.5);
 
 
 
@@ -213,7 +216,7 @@ const toolbar = new ui.Toolbar({
     this.paper.on('link:connect', (linkView, evt, connectedElementView) => {
       if (connectedElementView) {
         const targetCell = connectedElementView.model;
-        
+
         // Aquí puedes trabajar con el modelo del elemento conectado
       }
     });
@@ -254,29 +257,29 @@ const toolbar = new ui.Toolbar({
      this.paper.on('cell:pointermove', (cellView) => {
       this.emitGraphState('cell:pointermove', cellView);
     });
-    
+
     // Inicio del movimiento del cell
     this.paper.on('cell:pointerdown', (cellView) => {
       this.emitGraphState('cell:pointerdown', cellView);
     });
-    
+
     // Fin del movimiento del cell
     this.paper.on('cell:pointerup', (cellView) => {
       this.emitGraphState('cell:pointerup', cellView);
     });
-    
+
     // Otros eventos que quieras manejar
     this.paper.on('cell:mouseover', (cellView) => {
       this.emitGraphState('cell:mouseover', cellView);
     });
-    
+
     this.paper.on('cell:mouseout', (cellView) => {
       this.emitGraphState('cell:mouseout', cellView);
     });
 
-    
 
-    
+
+
 
     // Event listeners for inspector
     this.paper.on('cell:pointerdown', (cellView) => {
@@ -371,8 +374,8 @@ this.paper.on('cell:pointerup', (cellView) => {
           pointerdown: 'removeElement',
 
 
-        
-      
+
+
         }
       },
 
@@ -605,11 +608,9 @@ this.paper.on('cell:pointerup', (cellView) => {
 
     private emitGraphState(eventName: string, cellView: dia.CellView) {
       const graphState = this.graph.toJSON();
+
       this.socketService.emitEvent({
-        event: eventName,
-        cellId: cellView.model.id,
-        graph: graphState,
-        room: this.cookieService.get('room')
+        graph: graphState
       });
     }
 
